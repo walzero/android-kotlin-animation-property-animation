@@ -16,55 +16,43 @@
 
 package com.google.samples.propertyanimation
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import com.google.samples.propertyanimation.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var star: ImageView
-    lateinit var rotateButton: Button
-    lateinit var translateButton: Button
-    lateinit var scaleButton: Button
-    lateinit var fadeButton: Button
-    lateinit var colorizeButton: Button
-    lateinit var showerButton: Button
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        star = findViewById(R.id.star)
-        rotateButton = findViewById<Button>(R.id.rotateButton)
-        translateButton = findViewById<Button>(R.id.translateButton)
-        scaleButton = findViewById<Button>(R.id.scaleButton)
-        fadeButton = findViewById<Button>(R.id.fadeButton)
-        colorizeButton = findViewById<Button>(R.id.colorizeButton)
-        showerButton = findViewById<Button>(R.id.showerButton)
-
-        rotateButton.setOnClickListener {
+        binding.rotateButton.setOnClickListener {
             rotater()
         }
 
-        translateButton.setOnClickListener {
+        binding.translateButton.setOnClickListener {
             translater()
         }
 
-        scaleButton.setOnClickListener {
+        binding.scaleButton.setOnClickListener {
             scaler()
         }
 
-        fadeButton.setOnClickListener {
+        binding.fadeButton.setOnClickListener {
             fader()
         }
 
-        colorizeButton.setOnClickListener {
+        binding.colorizeButton.setOnClickListener {
             colorizer()
         }
 
-        showerButton.setOnClickListener {
+        binding.showerButton.setOnClickListener {
             shower()
         }
     }
