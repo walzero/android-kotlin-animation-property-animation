@@ -19,6 +19,7 @@ package com.google.samples.propertyanimation
 import android.animation.*
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
@@ -32,6 +33,7 @@ import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.databinding.DataBindingUtil
 import com.google.samples.propertyanimation.databinding.ActivityMainBinding
+import kotlin.math.absoluteValue
 import kotlin.random.Random
 
 
@@ -124,41 +126,58 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun shower() {
+        // Create a new star view in a random X position above the container.
+        // Make it rotateButton about its center as it falls to the bottom.
+
+        // Local variables we'll need in the code below
         val container = binding.star.parent as ViewGroup
         val containerW = container.width
         val containerH = container.height
         var starW: Float = binding.star.width.toFloat()
         var starH: Float = binding.star.height.toFloat()
 
+        // Create the new star (an ImageView holding our drawable) and add it to the container
         val newStar = AppCompatImageView(this)
-        newStar.layoutParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.WRAP_CONTENT,
-            FrameLayout.LayoutParams.WRAP_CONTENT
-        )
+        newStar.setImageResource(R.drawable.ic_star)
+        newStar.layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT)
         container.addView(newStar)
-        newStar.scaleX = Random.nextFloat() * 1.5f + .1f
+
+        // Scale the view randomly between 10-160% of its default size
+        newStar.scaleX = Math.random().toFloat() * 1.5f + .1f
         newStar.scaleY = newStar.scaleX
         starW *= newStar.scaleX
         starH *= newStar.scaleY
 
-        newStar.translationX = Random.nextFloat() * containerW - starW / 2
+        // Position the view at a random place between the left and right edges of the container
+        newStar.translationX = Math.random().toFloat() * containerW - starW / 2
 
-        val mover = ObjectAnimator
-            .ofFloat(newStar, View.TRANSLATION_Y, -starH, containerH + starH)
-            .apply {
-                interpolator = AccelerateInterpolator(1f)
-            }
-        
-        val rotator = ObjectAnimator
-            .ofFloat(newStar, View.ROTATION, (Random.nextInt() * 1080).toFloat())
-            .apply {
-                interpolator = LinearInterpolator()
-            }
+        // Create an animator that moves the view from a starting position right about the container
+        // to an ending position right below the container. Set an accelerate interpolator to give
+        // it a gravity/falling feel
+        val mover = ObjectAnimator.ofFloat(newStar, View.TRANSLATION_Y, -starH, containerH + starH)
+        mover.interpolator = AccelerateInterpolator(1f)
 
+        // Create an animator to rotateButton the view around its center up to three times
+        val rotator = ObjectAnimator.ofFloat(newStar, View.ROTATION,
+            (Math.random() * 1080).toFloat())
+        rotator.interpolator = LinearInterpolator()
+
+        // Use an AnimatorSet to play the falling and rotating animators in parallel for a duration
+        // of a half-second to two seconds
         val set = AnimatorSet()
         set.playTogether(mover, rotator)
-        set.duration = (Random.nextInt() * 1500 + 500).toLong()
-        set.doOnEnd { container.removeView(newStar) }
+        set.duration = (Math.random() * 1500 + 500).toLong()
+
+        // When the animation is done, remove the created view from the container
+        set.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                container.removeView(newStar)
+            }
+        })
+
+        // Start the animation
+        set.start()
     }
 
     private fun ObjectAnimator.disableButtonDuringAnimation(view: View) {
